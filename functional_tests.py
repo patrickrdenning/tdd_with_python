@@ -2,6 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import unittest
 
+import time as tm
+
 class NewVisitorTest(unittest.TestCase):  
 
     def setUp(self):  
@@ -34,8 +36,8 @@ class NewVisitorTest(unittest.TestCase):
 
         # When she hits enter, the page updates, and now the page lists
         # "1: Buy peacock feathers" as an item in a to-do list table
-        inputbox.send_keys(Keys.ENTER)  
-        time.sleep(1)  
+        inputbox.send_keys("Enter")  
+        tm.sleep(1)  
 
         table = self.browser.find_element(By.ID, 'id_list_table')
         rows = table.driver.find_elements(By.TAG_NAME, 'tr')  
