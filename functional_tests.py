@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 import unittest
 
 import time as tm
@@ -36,14 +37,17 @@ class NewVisitorTest(unittest.TestCase):
 
         # When she hits enter, the page updates, and now the page lists
         # "1: Buy peacock feathers" as an item in a to-do list table
-        inputbox.send_keys("Enter")  
+        inputbox.send_keys(Keys.ENTER)
         tm.sleep(1)  
 
         table = self.browser.find_element(By.ID, 'id_list_table')
-        rows = table.driver.find_elements(By.TAG_NAME, 'tr')  
-        self.assertTrue(
-            any(row.text == '1: Buy peacock feathers' for row in rows)
+        rows = table.find_elements(By.TAG_NAME, 'tr')  
+        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
+        self.assertIn(
+            "2: Use peacock feathers to make a fly",
+            [row.text for row in rows],
         )
+
 
         # There is still a text box inviting her to add another item. She
         # enters "Use peacock feathers to make a fly" (Edith is very
