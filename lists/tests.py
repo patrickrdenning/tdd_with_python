@@ -3,7 +3,6 @@ from django.test import TestCase
 from lists.models import Item
 
 
-
 class HomePageTest(TestCase):
     def test_uses_home_template(self):
         response = self.client.get("/")
@@ -17,7 +16,6 @@ class HomePageTest(TestCase):
         self.assertEqual(new_item.text, "A new list item")
 
         self.assertRedirects(response, "/")
-
 
     def test_only_saves_items_when_necessary(self):
         self.client.get("/")
