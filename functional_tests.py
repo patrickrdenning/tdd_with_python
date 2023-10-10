@@ -6,14 +6,13 @@ import django
 from django.test import TestCase
 from django.conf import settings
 import os
-from lists.models import Item
-import time as tm
-
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'superlists.settings')
 settings.configure
 django.setup()
 
+from lists.models import Item
+import time as tm
 
 class NewVisitorTest(TestCase):  
 
