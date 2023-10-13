@@ -12,7 +12,7 @@ def home_page(request):
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM lists_item")
         items = cursor.fetchall()
-        items = [Item(text=item[Item.ColumnsToItemFields.item_text]) for item in items]
+        items = [Item(text=item[Item.ITEM_FIELDS_TO_COLUMNS["text"]]) for item in items]
 
     return render(
         request,

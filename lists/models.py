@@ -7,5 +7,6 @@ from typing import NamedTuple
 class Item(models.Model):
     text = models.TextField(null=True)
 
-    class ColumnsToItemFields(NamedTuple):
-        item_text: int = 1
+    ITEM_FIELDS_TO_COLUMNS = {
+        "text": 1
+    }
