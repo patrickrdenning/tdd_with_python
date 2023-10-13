@@ -1,22 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-import unittest
-import django
-from django.test import TestCase
-from django.conf import settings
-import os
+from django.test import TestCase, LiveServerTestCase
 import time as tm
 
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "superlists.settings")
-settings.configure
-django.setup()
 
 from lists.models import Item
 
 
-class NewVisitorTest(TestCase):
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
 
@@ -31,7 +23,7 @@ class NewVisitorTest(TestCase):
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Edith has heard about a cool new online to-do app. She goes
         # to check out its homepage
-        self.browser.get("http://localhost:8000")
+        self.browser.get(self.live_server_url)
 
         # She notices the page title and header mention to-do lists
         self.assertIn("To-Do", self.browser.title)
@@ -80,7 +72,3 @@ class ItemModelTest(TestCase):
         second_saved_item = saved_items[1]
         self.assertEqual(first_saved_item.text, "The first (ever) list item")
         self.assertEqual(second_saved_item.text, "Item the second")
-
-
-if __name__ == "__main__":
-    unittest.main()
