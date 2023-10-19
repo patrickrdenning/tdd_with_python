@@ -70,7 +70,7 @@ class NewVisitorTest(LiveServerTestCase):
         # The page updates again, and now shows both items on her list
         self.wait_for_row_in_list_table("1: Buy peacock feathers")
         self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly")
-    
+
     def test_multiple_users_can_start_lists_at_different_urls(self):
         # Edith starts a new to-do list
         self.browser.get(self.live_server_url)
@@ -86,7 +86,7 @@ class NewVisitorTest(LiveServerTestCase):
         # Now a new user, Francis, comes along to the site.
 
         ## We delete all the browser's cookies
-        ## as a way of simulating a brand new user session  
+        ## as a way of simulating a brand new user session
         self.browser.delete_all_cookies()
 
         # Francis visits the home page.  There is no sign of Edith's
