@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from lists.models import Item
 
-from lists.sql_wrappers import select_all_items, insert_items
+from lists.sql_wrappers import get_all_items, create_items
 
 from django.db import connection
 
@@ -45,24 +45,24 @@ class NewListTest(TestCase):
         self.assertRedirects(response, "/lists/the-only-list-in-the-world/")
 
 
-class CustomORMTest(TestCase):
+class SQLWrappersTest(TestCase):
     def setUp(self):
         with connection.cursor() as cursor:
             cursor.execute("INSERT INTO lists_item (text) VALUES (%s)", ["test_text_1"])
             cursor.execute("INSERT INTO lists_item (text) VALUES (%s)", ["test_text_2"])
 
-    def test_can_select_all_items_with_text_field(self):
-        items = select_all_items()
+    def test_can_get_all_items_with_text_field(self):
+        items = get_all_items()
         self.assertEqual(len(items), 2)
         assert all(item.text in ["test_text_1", "test_text_2"] for item in items)
 
     def test_can_insert_new_item(self):
-        insert_items(["test_text"])
-        assert "test_text" in [item.text for item in select_all_items()]
+        create_items(["test_text"])
+        assert "test_text" in [item.text for item in get_all_items()]
 
     def test_can_insert_multiple_items(self):
         text_values = ["text_text_1", "test_text2"]
-        insert_items(text_values)
-        all_items = select_all_items()
+        create_items(text_values)
+        all_items = get_all_items()
         for value in text_values:
             assert value in [item.text for item in all_items]
