@@ -36,8 +36,8 @@ class ListViewTest(TestCase):
 class NewListTest(TestCase):
     def test_can_save_a_POST_request(self):
         self.client.post("/lists/new", data={"item_text": "A new list item"})
-        self.assertEqual(Item.objects.count(), 1)
-        new_item = Item.objects.get()
+        self.assertEqual(len(get_all_items()), 1)
+        new_item = get_all_items()[0]
         self.assertEqual(new_item.text, "A new list item")
 
     def test_redirects_after_POST(self):
