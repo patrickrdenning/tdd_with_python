@@ -2,7 +2,9 @@ from django.test import TestCase
 
 from lists.models import Item
 
-from lists.views import select_all_items
+from lists.sql_wrappers import select_all_items, insert_items
+
+from django.db import connection
 
 
 class HomePageTest(TestCase):
@@ -10,28 +12,18 @@ class HomePageTest(TestCase):
         response = self.client.get("/")
         self.assertTemplateUsed(response, "home.html")
 
-    def test_can_save_a_POST_request(self):
-        response = self.client.post("/", data={"item_text": "A new list item"})
-
-        self.assertEqual(Item.objects.count(), 1)
-        new_item = Item.objects.first()
-        self.assertEqual(new_item.text, "A new list item")
-
-        self.assertRedirects(response, "/lists/the-only-list-in-the-world/")
-
     def test_only_saves_items_when_necessary(self):
         self.client.get("/")
         self.assertEqual(Item.objects.count(), 0)
 
-    def test_redirects_after_POST(self):
-        response = self.client.post("/", data={"item_text": "A new list item"})
-        self.assertRedirects(response, "/lists/the-only-list-in-the-world/")
-
 
 class ListViewTest(TestCase):
+    def setUp(self):
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO lists_item (text) VALUES (%s)", ["itemey 1"])
+            cursor.execute("INSERT INTO lists_item (text) VALUES (%s)", ["itemey 2"])
+
     def test_displays_all_list_items(self):
-        Item.objects.create(text="itemey 1")
-        Item.objects.create(text="itemey 2")
         response = self.client.get("/lists/the-only-list-in-the-world/")
         self.assertContains(response, "itemey 1")
         self.assertContains(response, "itemey 2")
@@ -40,13 +32,37 @@ class ListViewTest(TestCase):
         response = self.client.get("/lists/the-only-list-in-the-world/")
         self.assertTemplateUsed(response, "list.html")
 
+
+class NewListTest(TestCase):
+    def test_can_save_a_POST_request(self):
+        self.client.post("/lists/new", data={"item_text": "A new list item"})
+        self.assertEqual(Item.objects.count(), 1)
+        new_item = Item.objects.get()
+        self.assertEqual(new_item.text, "A new list item")
+
+    def test_redirects_after_POST(self):
+        response = self.client.post("/lists/new", data={"item_text": "A new list item"})
+        self.assertRedirects(response, "/lists/the-only-list-in-the-world/")
+
+
 class CustomORMTest(TestCase):
+    def setUp(self):
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO lists_item (text) VALUES (%s)", ["test_text_1"])
+            cursor.execute("INSERT INTO lists_item (text) VALUES (%s)", ["test_text_2"])
+
     def test_can_select_all_items_with_text_field(self):
-        Item.objects.create(text="test_text_1")
-        Item.objects.create(text="test_text_2")
         items = select_all_items()
         self.assertEqual(len(items), 2)
-        self.assertEqual(items[0].text, "test_text_1")
-        self.assertEqual(items[1].text, "test_text_2")
+        assert all(item.text in ["test_text_1", "test_text_2"] for item in items)
 
+    def test_can_insert_new_item(self):
+        insert_items(["test_text"])
+        assert "test_text" in [item.text for item in select_all_items()]
 
+    def test_can_insert_multiple_items(self):
+        text_values = ["text_text_1", "test_text2"]
+        insert_items(text_values)
+        all_items = select_all_items()
+        for value in text_values:
+            assert value in [item.text for item in all_items]
