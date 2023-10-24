@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .sql_wrappers import get_all_items, create_items
+from .sql_wrappers import get_all, create_items
 
 
 def home_page(request):
@@ -10,7 +10,7 @@ def home_page(request):
 
 
 def view_list(request):
-    items = get_all_items()
+    items = get_all("item")
     return render(request, "list.html", {"items": items})
 
 
