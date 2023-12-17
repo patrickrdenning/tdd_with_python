@@ -5,9 +5,6 @@ from selenium.common.exceptions import WebDriverException
 from django.test import TestCase, LiveServerTestCase
 import time as tm
 
-
-from lists.models import Item
-
 MAX_WAIT = 1
 
 
